@@ -28,3 +28,9 @@ void Die::roll() {
 	//TODO: Implement weight system
 	last_roll = rand() % SIDES + 1;
 }
+
+vector<double> Die::get_weight() const{
+		cerr << "WARNING: Die::get_weights() is for debugging purposes only\n";
+		return weight;
+}
+
