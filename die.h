@@ -7,6 +7,7 @@ using std::vector;
 using std::cout;
 using std::endl;
 
+//TODO: add weight system for loaded dice
 class Die {
 	vector<double> weight;
 	unsigned int last_roll;

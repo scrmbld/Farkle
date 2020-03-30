@@ -26,7 +26,17 @@ int Die::get_roll() {
 
 void Die::roll() {
 	//TODO: Implement weight system
-	last_roll = rand() % SIDES + 1;
+	double rl = rand() % 1000;
+	rl /= 1000.0;
+	for (int i = 0; i < weight.size(); i++) {
+		rl -= weight.at(i);
+		if (rl <= 0) {
+			last_roll = i + 1;
+			return;
+		}
+	}
+
+	last_roll = SIDES; //if the for loop doesn't get it then the roll must be the highest possible value
 }
 
 vector<double> Die::get_weight() const{
