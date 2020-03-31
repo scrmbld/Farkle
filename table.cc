@@ -24,13 +24,23 @@ Table::Table(vector<Die> vec) {
 
 int Table::get_wager() { return bet; }
 int Table::get_points() { return pts; }
+int Table::get_roll(int i) { return dice.at(i).get_roll(); }
+
+//for debugging purposes only
 vector<Die> Table::get_dice() {
 	cerr << "WARNING: Table::get_dice() is for debugging purposes only\n";
 	return dice;
 }
 
+
 void Table::set_wager(int new_bet) { bet = new_bet; }
 void Table::set_points(int new_pts) { pts = new_pts; }
 void Table::operator+=(int new_pts) {
 	this->pts += new_pts;
+}
+
+void Table::roll() {
+	for (Die &d : dice) {
+		d.roll();
+	}
 }

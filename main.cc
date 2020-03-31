@@ -18,6 +18,7 @@ using namespace std;
 //TODO: extend table class for main game loop if necessary
 
 
+//WARNING: inserting new tests before the end WILL break successive tests if rand() is used
 
 //die tests
 TEST(dice_roll, good_tests) {
@@ -98,6 +99,18 @@ TEST(table_points, good_tests) {
 	EXPECT_EQ(t.get_points(), 8);
 }
 
+TEST(table_roll, good_tests) {
+	Table t;
+	t.roll();
+	
+	EXPECT_EQ(t.get_roll(0), 3);
+	EXPECT_EQ(t.get_roll(1), 3);
+	EXPECT_EQ(t.get_roll(2), 3);
+	EXPECT_EQ(t.get_roll(3), 1);
+	EXPECT_EQ(t.get_roll(4), 6);
+	EXPECT_EQ(t.get_roll(5), 6);
+}
+
 void turn(string p, Table t) {
 	cout << p << "'s turn" << endl;
 
@@ -124,6 +137,7 @@ int main(int argc, char** argv) {
 		gamers.push_back("player " + to_string(i));
 	}
 	Table t;
+	
 	int i = 0;
 	while (true) {
 		turn(gamers.at(i % gamers.size()), t);

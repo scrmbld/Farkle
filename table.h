@@ -24,4 +24,8 @@ class Table{
 
 		//operators
 		void operator+=(int new_pts);
+
+		void roll();
+
+		int get_roll(int);
 };
