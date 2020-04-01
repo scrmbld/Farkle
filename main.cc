@@ -16,7 +16,7 @@ using namespace std;
 //TODO: add player class (be sure to make tests)
 //TODO: make main game loop
 //TODO: extend table class for main game loop if necessary
-
+//TODO: make sure the hand_points function follows the game rules
 
 //WARNING: inserting new tests before the end WILL break successive tests if rand() is used
 
@@ -111,11 +111,71 @@ TEST(table_roll, good_tests) {
 	EXPECT_EQ(t.get_roll(5), 6);
 }
 
-void turn(string p, Table t) {
+
+int hand_points(vector<int> vec) {
+	int score = 0;
+	vector<int> counter(6);
+	for (int i : vec) {
+		counter.at(i - 1)++;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		if (counter.at(i) >= 3) {
+			if (i == 0) {//if we roll a one
+				score += 1000 * (counter.at(i) - 2);
+				continue;
+
+			} else score += 100 * (i + 1) * (counter.at(i) - 2);
+		}
+	}
+
+	if (counter.at(0) < 3) {//count ones (three of a kinds handled elsewhere)
+		score += 100 * counter.at(0);
+	} 
+	if (counter.at(4) < 3) {//count fives
+		score += 50 * counter.at(4);
+	}
+
+	return score;
+}
+
+//tests for functions in main:
+TEST(point_calc, good_tests) {
+	//no three of a kinds
+	EXPECT_EQ(hand_points({1, 5}), 150);
+	EXPECT_EQ(hand_points({1, 2, 3, 4, 5, 6}), 150);
+	EXPECT_EQ(hand_points({1, 3, 4, 5, 6, 6}), 150);
+
+	//three of a kinds
+	EXPECT_EQ(hand_points({1, 1, 1}), 1000);
+	EXPECT_EQ(hand_points({1, 1, 1, 5}), 1050);
+	EXPECT_EQ(hand_points({3, 3, 3}), 300);
+	EXPECT_EQ(hand_points({1, 3, 3, 3}), 400);
+	EXPECT_EQ(hand_points({3, 3, 3, 6, 6, 6}), 900);
+
+	//four of a kinds
+	EXPECT_EQ(hand_points({3, 3, 6, 6, 6, 6}), 1200);
+	EXPECT_EQ(hand_points({1, 1, 1, 1}), 2000);
+	EXPECT_EQ(hand_points({1, 1, 1, 1, 5, 5}), 2100);
+}
+
+void turn(string &p, Table &t) {
 	cout << p << "'s turn" << endl;
 
-	//roll dice
+	//roll the dice
+	t.roll();
+
+	for (int i = 0; i < 6; i++) {
+		cout << "Die " << i << ": " << t.get_roll(i) << endl;
+	}
 	//select dice
+	cout << "which dice do you want to keep? (-1 to quit)\n";
+	while (true) {
+		int choice = 0;
+		cin >> choice;
+		if (choice == -1) break;
+		else cout << "Keeping die " << choice << ": " << t.get_roll(choice) << endl;
+	}
 	//roll again or bank points
 	//return points?
 }
@@ -123,21 +183,21 @@ void turn(string p, Table t) {
 
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
-	
+
 	cout << "Hello World!\n";
-	
+
 	if (argc > 1) {
 		srand(0);
 		return RUN_ALL_TESTS();
 	}
 	srand(time(0));
-	
+
 	vector <string> gamers; //the players (switch to player class later)
 	for (int i = 0; i < 3; i++) {
 		gamers.push_back("player " + to_string(i));
 	}
 	Table t;
-	
+
 	int i = 0;
 	while (true) {
 		turn(gamers.at(i % gamers.size()), t);
