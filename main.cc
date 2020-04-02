@@ -5,14 +5,15 @@
 #include <vector>
 #include "die.h"
 #include "table.h"
+#include "player.h"
 using namespace std;
 
 /*So Far:
-	basic die class
-	basic table class
-	implemented gtests for die and table classes
+  basic die class
+  basic table class
+  implemented gtests for die and table classes
 
- */
+*/
 //TODO: add player class (be sure to make tests)
 //TODO: make main game loop
 //TODO: extend table class for main game loop if necessary
@@ -36,7 +37,7 @@ TEST(dice_load, good_tests) {
 	EXPECT_EQ(d.get_weight(), vec);
 
 	Die d2;
-	
+
 	EXPECT_NE(d.get_weight(), d2.get_weight());
 	EXPECT_EQ(d.get_weight().size(), d.SIDES);
 	EXPECT_EQ(d.get_weight().size(), d2.get_weight().size());
@@ -102,13 +103,34 @@ TEST(table_points, good_tests) {
 TEST(table_roll, good_tests) {
 	Table t;
 	t.roll();
-	
+
 	EXPECT_EQ(t.get_roll(0), 3);
 	EXPECT_EQ(t.get_roll(1), 3);
 	EXPECT_EQ(t.get_roll(2), 3);
 	EXPECT_EQ(t.get_roll(3), 1);
 	EXPECT_EQ(t.get_roll(4), 6);
 	EXPECT_EQ(t.get_roll(5), 6);
+}
+
+TEST(player_points, good_tests) {
+	Player p;
+	EXPECT_EQ(p.GetScore(), 0);
+	p.AddScore(30);
+	EXPECT_EQ(p.GetScore(), 30);
+	p.AddScore(30);
+	EXPECT_EQ(p.GetScore(), 60);
+	p.SetScore(30);
+	EXPECT_EQ(p.GetScore(), 30);
+}
+
+TEST(player_money, good_tests) {
+	Player p;
+	EXPECT_EQ(p.GetMoney(), 100);
+	p.AddMoney(20);
+	EXPECT_EQ(p.GetMoney(), 120);
+	p.SetMoney(20);
+	EXPECT_EQ(p.GetMoney(), 20);
+
 }
 
 
@@ -161,23 +183,44 @@ TEST(point_calc, good_tests) {
 
 void turn(string &p, Table &t) {
 	cout << p << "'s turn" << endl;
+	t.set_points(0);
 
-	//roll the dice
-	t.roll();
 
-	for (int i = 0; i < 6; i++) {
-		cout << "Die " << i << ": " << t.get_roll(i) << endl;
-	}
-	//select dice
-	cout << "which dice do you want to keep? (-1 to quit)\n";
 	while (true) {
-		int choice = 0;
-		cin >> choice;
-		if (choice == -1) break;
-		else cout << "Keeping die " << choice << ": " << t.get_roll(choice) << endl;
+		//roll the dice
+		t.roll();
+
+		//print the rolls
+		for (int i = 0; i < 6; i++) {
+			cout << "Die " << i << ": " << t.get_roll(i) << endl;
+		}
+		//select dice
+		vector<int> saved_rolls;
+		cout << "which dice do you want to keep? (-1 to quit)\n";
+		while (true) {
+			int choice = 0;
+			cin >> choice;
+			if (choice == -1) break;
+			else cout << "Keeping die " << choice << ": " << t.get_roll(choice) << endl;
+			saved_rolls.push_back(t.get_roll(choice));
+		}
+
+		t += hand_points(saved_rolls);
+		cout << "current points: " << t.get_points() << endl;
+		//roll again or bank points
+		while (true) {
+			cout << "Do you want to roll again? (y/n)" << endl;
+			string s;
+			cin >> s;
+			if (s == "n" || s == "N") {
+				//add points to player
+				return;
+			}
+			else if (s == "y" || s == "Y") {
+				break;
+			}
+		}
 	}
-	//roll again or bank points
-	//return points?
 }
 
 
@@ -197,6 +240,7 @@ int main(int argc, char** argv) {
 		gamers.push_back("player " + to_string(i));
 	}
 	Table t;
+	Player p;
 
 	int i = 0;
 	while (true) {
