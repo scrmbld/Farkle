@@ -31,10 +31,11 @@ TEST(dice_roll, good_tests) {
 	EXPECT_EQ(d.get_roll(), 6);
 }
 
-TEST(dice_load, good_tests) {
+TEST(dice_loaded, good_tests) {
 	Die d({0.2, 0.1, 0.4, 0.1, 0.1, 0.1}, 6);
 	vector<double> vec = {0.2, 0.1, 0.4, 0.1, 0.1, 0.1};
 	EXPECT_EQ(d.get_weight(), vec);
+	EXPECT_EQ(d.get_name(), "cheater die");
 
 	Die d2;
 
@@ -42,7 +43,8 @@ TEST(dice_load, good_tests) {
 	EXPECT_EQ(d.get_weight().size(), d.SIDES);
 	EXPECT_EQ(d.get_weight().size(), d2.get_weight().size());
 
-	Die d3({0.1, 0.1, 0.1, 0.1, 0.1, 0.5}, 6);
+	Die d3({0.1, 0.1, 0.1, 0.1, 0.1, 0.5}, 6, "The Devil's Die");
+	EXPECT_EQ(d3.get_name(), "The Devil's Die");
 	int sixes = 0;
 	int ones = 0;
 	for (int i = 0; i < 1000; i++) {
@@ -272,8 +274,12 @@ int main(int argc, char** argv) {
 		if (s.size()) gamers.push_back(Player(s));
 		else gamers.push_back(Player());
 	}
-	Table t;
-	Player p;
+
+	vector<Die> dice;
+	for (int i = 0; i < 6; i++) {
+		dice.push_back(Die({0.4, 0.0, 0.0, 0.2 ,0.1, 0.3}, 6));
+	}
+	Table t(dice);
 
 	system("clear");
 	int i = 0;

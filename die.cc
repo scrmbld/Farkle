@@ -1,5 +1,6 @@
 #include "die.h"
 #include <cassert>
+#include <string>
 using namespace std;
 
 Die::Die() : SIDES(6), last_roll(0) {
@@ -8,7 +9,7 @@ Die::Die() : SIDES(6), last_roll(0) {
 }
 
 
-Die::Die(vector<double> new_weights, const int new_sides) : SIDES(new_sides), last_roll(0) {
+Die::Die(vector<double> new_weights, const int new_sides) : SIDES(new_sides), last_roll(0), name("cheater die") {
 	assert(new_sides >= 4);
 	assert(new_weights.size() == SIDES);
 	double sum = 0;
@@ -21,6 +22,17 @@ Die::Die(vector<double> new_weights, const int new_sides) : SIDES(new_sides), la
 	assert(sum > .99 && sum < 1.01);
 }
 
+Die::Die(vector<double> new_weights, const int new_sides, string new_name) : SIDES(new_sides), last_roll(0), name(new_name) {
+	assert(new_sides >= 4);
+	assert(new_weights.size() == SIDES);
+	double sum = 0;
+	for (unsigned int i = 0; i < SIDES; i++) {
+		assert(new_weights[i] >= 0 && new_weights[i] <= 1);
+		sum += new_weights[i];
+		weight.push_back(new_weights[i]);
+	}
+	assert(sum > .99 && sum < 1.01);
+}
 
 int Die::get_roll() const {
 	assert(last_roll >= 1 && last_roll <= SIDES);
@@ -45,6 +57,7 @@ void Die::save() { saved = true; }
 void Die::unsave() { saved = false; }
 bool Die::is_saved() const { return saved; }
 
+string Die::get_name() const { return name; }
 
 vector<double> Die::get_weight() const{
 		return weight;
