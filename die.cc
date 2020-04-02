@@ -7,6 +7,7 @@ Die::Die() : SIDES(6), last_roll(0) {
 		weight.push_back(1.0/SIDES);
 }
 
+
 Die::Die(vector<double> new_weights, const int new_sides) : SIDES(new_sides), last_roll(0) {
 	assert(new_sides >= 4);
 	assert(new_weights.size() == SIDES);
@@ -16,16 +17,17 @@ Die::Die(vector<double> new_weights, const int new_sides) : SIDES(new_sides), la
 		sum += new_weights[i];
 		weight.push_back(new_weights[i]);
 	}
+
 	assert(sum > .99 && sum < 1.01);
 }
 
-int Die::get_roll() {
+
+int Die::get_roll() const {
 	assert(last_roll >= 1 && last_roll <= SIDES);
 	return last_roll;
 }
 
 void Die::roll() {
-	//TODO: Implement weight system
 	double rl = rand() % 1000;
 	rl /= 1000.0;
 	for (int i = 0; i < weight.size(); i++) {
@@ -39,8 +41,12 @@ void Die::roll() {
 	last_roll = SIDES; //if the for loop doesn't get it then the roll must be the highest possible value
 }
 
+void Die::save() { saved = true; }
+void Die::unsave() { saved = false; }
+bool Die::is_saved() const { return saved; }
+
+
 vector<double> Die::get_weight() const{
-		cerr << "WARNING: Die::get_weights() is for debugging purposes only\n";
 		return weight;
 }
 

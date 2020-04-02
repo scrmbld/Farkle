@@ -136,8 +136,9 @@ TEST(player_money, good_tests) {
 
 int hand_points(vector<int> vec) {
 	int score = 0;
-	vector<int> counter(6);
+	vector<int> counter(6);//holds how many times each number was rolled
 	for (int i : vec) {
+		if (i < 1 || i > 6) continue;//throw out invalid values
 		counter.at(i - 1)++;
 	}
 
@@ -181,8 +182,9 @@ TEST(point_calc, good_tests) {
 	EXPECT_EQ(hand_points({1, 1, 1, 1, 5, 5}), 2100);
 }
 
-void turn(string &p, Table &t) {
-	cout << p << "'s turn" << endl;
+void turn(Player &p, Table &t, int pl) {
+	cout << "=============================================\n";
+	cout << pl << "'s turn" << endl;
 	t.set_points(0);
 
 
@@ -191,29 +193,56 @@ void turn(string &p, Table &t) {
 		t.roll();
 
 		//print the rolls
-		for (int i = 0; i < 6; i++) {
-			cout << "Die " << i << ": " << t.get_roll(i) << endl;
+		cout << "--------\n";
+		t.print_rolls();
+		
+		if (!hand_points(t.get_rolls())) {
+			cout << "Farkle!\n";
+			t.clear();
+			return;
 		}
+
 		//select dice
-		vector<int> saved_rolls;
+		vector<int> saved_rolls;//used for score calculation
 		cout << "which dice do you want to keep? (-1 to quit)\n";
 		while (true) {
 			int choice = 0;
 			cin >> choice;
-			if (choice == -1) break;
-			else cout << "Keeping die " << choice << ": " << t.get_roll(choice) << endl;
-			saved_rolls.push_back(t.get_roll(choice));
+			if (choice == -1) {
+				if (saved_rolls.size() == 0) {
+					cout << "You must select at least one die" << endl;
+					continue;
+				}
+				break;
+			}
+			else {
+				saved_rolls.push_back(t.save_roll(choice));
+			}
 		}
+		
+		cout << "--------\n";
 
 		t += hand_points(saved_rolls);
 		cout << "current points: " << t.get_points() << endl;
 		//roll again or bank points
 		while (true) {
+			if (t.all_saved()) {
+				p.AddScore(t.get_points());
+				cout << "Turn over\n";
+				cout << "Adding points to total: ";
+				cout << "p" << pl << " points total: " << p.GetScore() << endl;
+				t.clear();
+				return;
+			}
 			cout << "Do you want to roll again? (y/n)" << endl;
 			string s;
 			cin >> s;
 			if (s == "n" || s == "N") {
-				//add points to player
+				p.AddScore(t.get_points());
+				cout << "Turn over\n";
+				cout << "Adding points to total: ";
+				cout << "p" << pl << " points total: " << p.GetScore() << endl;
+				t.clear();
 				return;
 			}
 			else if (s == "y" || s == "Y") {
@@ -221,13 +250,14 @@ void turn(string &p, Table &t) {
 			}
 		}
 	}
+
+	t.clear();
 }
 
 
 int main(int argc, char** argv) {
 	testing::InitGoogleTest(&argc, argv);
 
-	cout << "Hello World!\n";
 
 	if (argc > 1) {
 		srand(0);
@@ -235,19 +265,22 @@ int main(int argc, char** argv) {
 	}
 	srand(time(0));
 
-	vector <string> gamers; //the players (switch to player class later)
+	vector <Player> gamers; //the players (switch to player class later)
 	for (int i = 0; i < 3; i++) {
-		gamers.push_back("player " + to_string(i));
+		gamers.push_back(Player());
 	}
 	Table t;
 	Player p;
 
 	int i = 0;
 	while (true) {
-		turn(gamers.at(i % gamers.size()), t);
+		turn(gamers.at(i % gamers.size()), t, i % gamers.size());
 		//break if someone has 2000 points
+		for (Player g : gamers) {
+			if (g.GetScore() >= 2000) {
+				return 0;
+			}
+		}
 		i++;
-		//placeholder base condition (need a player class!)
-		if (i / gamers.size() > 3) break;
 	}
 }
