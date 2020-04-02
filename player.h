@@ -7,13 +7,13 @@ class Player {
 	private:
 		int score;
 		int money;
-
+		const string name;
 	public:
 		Player();
+		Player(string);
 		void AddScore(int add);
 		void AddMoney(int add);
-		void SetScore(int new_score);
-		void SetMoney(int new_score);
 		int GetScore();
 		int GetMoney();
+		string GetName();
 };

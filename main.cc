@@ -119,8 +119,6 @@ TEST(player_points, good_tests) {
 	EXPECT_EQ(p.GetScore(), 30);
 	p.AddScore(30);
 	EXPECT_EQ(p.GetScore(), 60);
-	p.SetScore(30);
-	EXPECT_EQ(p.GetScore(), 30);
 }
 
 TEST(player_money, good_tests) {
@@ -128,9 +126,6 @@ TEST(player_money, good_tests) {
 	EXPECT_EQ(p.GetMoney(), 100);
 	p.AddMoney(20);
 	EXPECT_EQ(p.GetMoney(), 120);
-	p.SetMoney(20);
-	EXPECT_EQ(p.GetMoney(), 20);
-
 }
 
 
@@ -182,9 +177,9 @@ TEST(point_calc, good_tests) {
 	EXPECT_EQ(hand_points({1, 1, 1, 1, 5, 5}), 2100);
 }
 
-void turn(Player &p, Table &t, int pl) {
+void turn(Player &p, Table &t) {
 	cout << "=============================================\n";
-	cout << pl << "'s turn" << endl;
+	cout << p.GetName() << "'s turn" << "(" << p.GetScore() << "pts)" << endl;
 	t.set_points(0);
 
 
@@ -195,7 +190,7 @@ void turn(Player &p, Table &t, int pl) {
 		//print the rolls
 		cout << "--------\n";
 		t.print_rolls();
-		
+
 		if (!hand_points(t.get_rolls())) {
 			cout << "Farkle!\n";
 			t.clear();
@@ -208,6 +203,11 @@ void turn(Player &p, Table &t, int pl) {
 		while (true) {
 			int choice = 0;
 			cin >> choice;
+			if (!cin) {
+				cin.clear();
+				cin.ignore(512, '\n');
+				continue;
+			}
 			if (choice == -1) {
 				if (saved_rolls.size() == 0) {
 					cout << "You must select at least one die" << endl;
@@ -219,7 +219,7 @@ void turn(Player &p, Table &t, int pl) {
 				saved_rolls.push_back(t.save_roll(choice));
 			}
 		}
-		
+
 		cout << "--------\n";
 
 		t += hand_points(saved_rolls);
@@ -229,8 +229,7 @@ void turn(Player &p, Table &t, int pl) {
 			if (t.all_saved()) {
 				p.AddScore(t.get_points());
 				cout << "Turn over\n";
-				cout << "Adding points to total: ";
-				cout << "p" << pl << " points total: " << p.GetScore() << endl;
+				cout << "p" << p.GetName() << " updated points total: " << p.GetScore() << endl;
 				t.clear();
 				return;
 			}
@@ -239,9 +238,9 @@ void turn(Player &p, Table &t, int pl) {
 			cin >> s;
 			if (s == "n" || s == "N") {
 				p.AddScore(t.get_points());
-				cout << "Turn over\n";
 				cout << "Adding points to total: ";
-				cout << "p" << pl << " points total: " << p.GetScore() << endl;
+				cout << "p" << p.GetName() << " points total: " << p.GetScore() << endl;
+				cout << "Next Turn!\n";
 				t.clear();
 				return;
 			}
@@ -266,18 +265,24 @@ int main(int argc, char** argv) {
 	srand(time(0));
 
 	vector <Player> gamers; //the players (switch to player class later)
-	for (int i = 0; i < 3; i++) {
-		gamers.push_back(Player());
+	for (int i = 0; i < 2; i++) {
+		cout << "What's player " << i << "'s name?" << endl;
+		string s;
+		getline(cin, s);
+		if (s.size()) gamers.push_back(Player(s));
+		else gamers.push_back(Player());
 	}
 	Table t;
 	Player p;
 
+	system("clear");
 	int i = 0;
 	while (true) {
-		turn(gamers.at(i % gamers.size()), t, i % gamers.size());
+		turn(gamers.at(i % gamers.size()), t);
 		//break if someone has 2000 points
 		for (Player g : gamers) {
 			if (g.GetScore() >= 2000) {
+				cout << g.GetName() << "wins!" << endl;
 				return 0;
 			}
 		}
