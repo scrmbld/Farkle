@@ -1,3 +1,4 @@
+//Die class by allen
 #pragma once
 #include <iostream>
 #include <vector>
@@ -30,3 +31,4 @@ class Die {
 	vector<double> get_weight() const;
 	
 };
+//ok let's be real here kerney did most of the actual work

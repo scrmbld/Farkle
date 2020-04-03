@@ -1,24 +1,16 @@
-//Write your last name and your partner's name here
+//Allen and Thompson
 //enter any command line parameter to run tests
 #include <iostream>
 #include <gtest/gtest.h>
 #include <vector>
+#include <limits>
 #include "die.h"
 #include "table.h"
 #include "player.h"
 #include "load_dice.h"
 using namespace std;
 
-/*So Far:
-  basic die class
-  basic table class
-  implemented gtests for die and table classes
-
-*/
-//TODO: add player class (be sure to make tests)
-//TODO: make main game loop
-//TODO: extend table class for main game loop if necessary
-//TODO: make sure the hand_points function follows the game rules
+//TODO: add ai?
 
 //WARNING: inserting new tests before the end WILL break successive tests if rand() is used
 
@@ -229,6 +221,7 @@ void turn(Player &p, Table &t) {
 		cout << "current points: " << t.get_points() << endl;
 		//roll again or bank points
 		while (true) {
+			//if every dice gets picked the turn ends
 			if (t.all_saved()) {
 				p.AddScore(t.get_points());
 				cout << "Turn over\n";
@@ -236,6 +229,7 @@ void turn(Player &p, Table &t) {
 				t.clear();
 				return;
 			}
+
 			cout << "Do you want to roll again? (y/n)" << endl;
 			string s;
 			cin >> s;
@@ -248,7 +242,7 @@ void turn(Player &p, Table &t) {
 				return;
 			}
 			else if (s == "y" || s == "Y") {
-				break;
+				break; //goes back to rolling
 			}
 		}
 	}
@@ -267,7 +261,6 @@ int main(int argc, char** argv) {
 	}
 	srand(time(0));
 
-	vector<Die> die_types = load_dice();
 	vector <Player> gamers; //the players (switch to player class later)
 	for (int i = 0; i < 2; i++) {
 		cout << "What's player " << i << "'s name?" << endl;
@@ -278,22 +271,25 @@ int main(int argc, char** argv) {
 	}
 
 
+	//decide wether or not to use cheater dice
 	vector<Die> dice;
 	cout << "Do you want to use cheater dice? (y/n)" << endl;
 	while (true) {
 		string choice;
 		cin >> choice;
 		if (choice == "y" || choice == "Y") {
+			vector<Die> die_types = load_dice(); //load in the cheater dice
+			//select 6 random cheater dice from die_types
 			for (int i = 0; i < 6; i++) {
 				int choice = rand() % die_types.size();
-				cout << "Die " << i << " " << die_types.at(choice).get_name() << endl;
+				cout << "Die " << i << ": " << die_types.at(choice).get_name() << endl;
 				dice.push_back(die_types.at(choice));
 			}
 			break;
 		} else if (choice == "n" || choice == "N") {
 			for (int i = 0; i < 6; i++) {
 				cout << "Using fair, normal dice" << endl;
-				dice.push_back(die_types.back()); //die_types.back == Die()
+				dice.push_back(Die());
 			}
 			break;
 		}
@@ -306,6 +302,8 @@ int main(int argc, char** argv) {
 	string tresh;
 	getline(cin, tresh);
 	getline(cin, tresh);
+
+
 	system("clear");
 	int i = 0;
 	while (true) {

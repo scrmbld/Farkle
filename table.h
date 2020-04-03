@@ -1,3 +1,4 @@
+//by allen
 #pragma once
 #include <iostream>
 #include "die.h"

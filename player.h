@@ -1,3 +1,4 @@
+//Player class by Thompson
 #pragma once
 #include <iostream>
 #include "player.h"
@@ -7,7 +8,7 @@ class Player {
 	private:
 		int score;
 		int money;
-		const string name;
+		const string name;//except the name system, by allen
 	public:
 		Player();
 		Player(string);

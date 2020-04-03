@@ -4,6 +4,7 @@
 
 vector<Die> load_dice() {
 	vector<Die> revtal;
+	//Die types by thompson
 	revtal.push_back(Die({0.44,0.11,0.11,0.11,0.12,0.11}, 6, "Biased"));
 	revtal.push_back(Die({0.1,0.3,0.1,0.2,0.1,0.2}, 6, "Even"));
 	revtal.push_back(Die({0.3,0.1,0.2,0.1,0.2,0.1}, 6, "Odd"));
