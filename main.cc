@@ -275,11 +275,7 @@ int main(int argc, char** argv) {
 		else gamers.push_back(Player());
 	}
 
-	vector<Die> dice;
-	for (int i = 0; i < 6; i++) {
-		dice.push_back(Die({0.4, 0.0, 0.0, 0.2 ,0.1, 0.3}, 6));
-	}
-	Table t(dice);
+	Table t();
 
 	system("clear");
 	int i = 0;
